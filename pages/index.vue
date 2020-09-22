@@ -66,8 +66,10 @@ export default class IndexPage extends Vue {
 
   problems: Array<Problem> = []
 
+  serverInfos: Array<Problem> = []
+
   get pageTitle(): string|undefined {
-    return process.env.title
+    return this.$config.title
   }
 
   get uploadable(): boolean {
@@ -89,16 +91,20 @@ export default class IndexPage extends Vue {
   detectProblems() {
     const problems = []
     if (!this.imageUrl) {
-      problems.push(new Problem(ProblemLevel.INFO, '请选择图片'))
+      problems.push(new Problem(ProblemLevel.INFO, '请先选择一张图片'))
     } else if (this.imageUrl.length > 2 * 1024 * 1024) {
       // Must be smaller than 2MB
       problems.push(new Problem(ProblemLevel.ERROR, '由于系统限制，图片大小必须小于 2MB'))
     }
     this.problems = problems
+    this.serverInfos = []
   }
 
   uploadImage() {
-
+    this.detectProblems()
+    if (this.problems.length === 0) {
+      // TODO: Upload the image.
+    }
   }
 
   mounted() {

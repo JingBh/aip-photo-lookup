@@ -7,7 +7,7 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: process.env.description }
+      { hid: 'description', name: 'description', content: packageMeta.description }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -23,9 +23,13 @@ export default {
   plugins: [
   ],
 
-  env: {
-    title: process.env.PAGE_TITLE || packageMeta.name,
-    description: process.env.PAGE_DESCRIPTION || packageMeta.description
+  // Runtime config (https://nuxtjs.org/guide/runtime-config)
+  publicRuntimeConfig: {
+    title: process.env.PAGE_TITLE || packageMeta.name
+  },
+
+  privateRuntimeConfig: {
+    // TODO: Baidu AIP config
   },
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
