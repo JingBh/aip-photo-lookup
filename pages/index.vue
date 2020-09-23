@@ -57,7 +57,8 @@ import ProblemComponent from '~/components/Problem.vue'
 @Component({
   components: {
     ProblemComponent
-  }
+  },
+  middleware: 'check_access'
 })
 export default class IndexPage extends Vue {
   image: File|null = null

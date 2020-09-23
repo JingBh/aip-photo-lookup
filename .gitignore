@@ -291,3 +291,5 @@ $RECYCLE.BIN/
 .pnp.*
 
 # End of https://www.toptal.com/developers/gitignore/api/vue,yarn,vuejs,nuxtjs,windows,webstorm,visualstudiocode,node
+
+.node-persist

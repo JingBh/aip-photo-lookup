@@ -1655,7 +1655,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nuxtjs/axios@npm:^5.12.2":
+"@nuxtjs/auth@npm:^4.9.1":
+  version: 4.9.1
+  resolution: "@nuxtjs/auth@npm:4.9.1"
+  dependencies:
+    "@nuxtjs/axios": ^5.9.5
+    body-parser: ^1.19.0
+    consola: ^2.11.3
+    cookie: ^0.4.0
+    is-https: ^1.0.0
+    js-cookie: ^2.2.1
+    lodash: ^4.17.15
+    nanoid: ^2.1.11
+  checksum: 2994ea21fc905d46d4d4ec3e50bf36dda52cd59c2f333519cae4d6a5ad81d92d1504e57ff78db73329e0aee998eac0ef197470c300ea4bf35d7ff7ac616521ab
+  languageName: node
+  linkType: hard
+
+"@nuxtjs/axios@npm:^5.12.2, @nuxtjs/axios@npm:^5.9.5":
   version: 5.12.2
   resolution: "@nuxtjs/axios@npm:5.12.2"
   dependencies:
@@ -1935,6 +1951,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/md5@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@types/md5@npm:2.2.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: ba42fbc4f4954dc4f680e013b90507a190baeab2f28e0c5c4b540ceb95e306f902532afe7ce3cbbba704908c044b21f5f29f60f7ba58188597b87d80ab3baa2f
+  languageName: node
+  linkType: hard
+
 "@types/memory-fs@npm:*":
   version: 0.3.2
   resolution: "@types/memory-fs@npm:0.3.2"
@@ -1948,6 +1973,15 @@ __metadata:
   version: 2.0.3
   resolution: "@types/mime@npm:2.0.3"
   checksum: 6df548a912494f8579d548cd883be0425f30eaa2922283335c405e270600f49045a06d766460c0f0edabb41dff570c614d174d3c52215de3bddd11f190ec9ae9
+  languageName: node
+  linkType: hard
+
+"@types/node-persist@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@types/node-persist@npm:3.1.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 3f601c35505c74a6d2e178cc9cc5d218fe91570f376ff586e0d6d46803182eb7d3c5273b4ced18f4e70161106253874bed9f90e9fe2960a0c1033b09b1bfbf3d
   languageName: node
   linkType: hard
 
@@ -2617,10 +2651,14 @@ __metadata:
     "@nuxt/types": ^2.14.5
     "@nuxt/typescript-build": ^2.0.3
     "@nuxt/typescript-runtime": ^2.0.0
+    "@nuxtjs/auth": ^4.9.1
     "@nuxtjs/axios": ^5.12.2
     "@nuxtjs/eslint-config": ^3.1.0
     "@nuxtjs/eslint-config-typescript": ^3.0.0
     "@nuxtjs/eslint-module": ^2.0.0
+    "@types/md5": ^2.2.0
+    "@types/node-persist": ^3.1.0
+    axios: ^0.20.0
     babel-eslint: ^10.1.0
     baidu-aip-sdk: ^2.4.6
     bootstrap: ^4.5.2
@@ -2628,6 +2666,10 @@ __metadata:
     core-js: ^3.6.5
     eslint: ^7.8.1
     eslint-plugin-nuxt: ^1.0.0
+    express: ^4.17.1
+    express-bearer-token: ^2.4.0
+    md5: ^2.3.0
+    node-persist: ^3.1.0
     nuxt: ^2.14.5
     sass: ^1.26.11
     sass-loader: ^10.0.2
@@ -3212,7 +3254,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"body-parser@npm:1.19.0":
+"body-parser@npm:1.19.0, body-parser@npm:^1.19.0":
   version: 1.19.0
   resolution: "body-parser@npm:1.19.0"
   dependencies:
@@ -3695,6 +3737,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"charenc@npm:0.0.2":
+  version: 0.0.2
+  resolution: "charenc@npm:0.0.2"
+  checksum: ff8199e90334dc7bb60a9fe0aa2bef3e72b1d125e801151459db1cf1c9b77c437ad4a5d9248ee0003720bcb537a90787a53f6e2e1613dbf5fba46f59d5547307
+  languageName: node
+  linkType: hard
+
 "check-types@npm:^8.0.3":
   version: 8.0.3
   resolution: "check-types@npm:8.0.3"
@@ -4106,6 +4155,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cookie-parser@npm:^1.4.4":
+  version: 1.4.5
+  resolution: "cookie-parser@npm:1.4.5"
+  dependencies:
+    cookie: 0.4.0
+    cookie-signature: 1.0.6
+  checksum: a3eeda832d81862477e40444a8d411595b91e15f9b1d2b397a173e9efa744a29129de9aaa99342cf9468641d854a464c4e215cd60d1df49374c9ccffa1af52bf
+  languageName: node
+  linkType: hard
+
 "cookie-signature@npm:1.0.6":
   version: 1.0.6
   resolution: "cookie-signature@npm:1.0.6"
@@ -4124,6 +4183,13 @@ __metadata:
   version: 0.3.1
   resolution: "cookie@npm:0.3.1"
   checksum: 5fb6caf84d4e1f5684abae2a29d019466166a452539ef43562eaba5bf2f5d40a5cf0d0b4e46614fb8e6b408fd0c718885ba6696ce976e2c53d07216152ec7091
+  languageName: node
+  linkType: hard
+
+"cookie@npm:^0.4.0":
+  version: 0.4.1
+  resolution: "cookie@npm:0.4.1"
+  checksum: b8e0928e3e7aba013087974b33a6eec730b0a68b7ec00fc3c089a56ba2883bcf671252fc2ed64775aa1ca64796b6e1f6fdddba25a66808aef77614d235fd3e06
   languageName: node
   linkType: hard
 
@@ -4265,6 +4331,13 @@ __metadata:
     shebang-command: ^2.0.0
     which: ^2.0.1
   checksum: 51f10036f5f1de781be98f4738d58b50c6d44f4f471069b8ab075b21605893ba1548654880f7310a29a732d6fc7cd481da6026169b9f0831cab0148a62fb397a
+  languageName: node
+  linkType: hard
+
+"crypt@npm:0.0.2":
+  version: 0.0.2
+  resolution: "crypt@npm:0.0.2"
+  checksum: 1ad9c8439ad26eef21ca130df3e79fff4915e839167efde163891b935ffb41742bfbc359bb00ae8b1ff205db52e7fb0e32326b84b7f977cd6e6a279eed9dc742
   languageName: node
   linkType: hard
 
@@ -5576,7 +5649,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.16.3":
+"express-bearer-token@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "express-bearer-token@npm:2.4.0"
+  dependencies:
+    cookie: ^0.3.1
+    cookie-parser: ^1.4.4
+  checksum: abf3df0b35cdb86d0a34583bdb57b200e4fc39107e1d01832b219e3a9b876d04d6cafe507bd1d26bf1ce6f1251dbb6a19ad9699b8f4688b939787ba6bae0cdca
+  languageName: node
+  linkType: hard
+
+"express@npm:^4.16.3, express@npm:^4.17.1":
   version: 4.17.1
   resolution: "express@npm:4.17.1"
   dependencies:
@@ -6972,7 +7055,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"is-buffer@npm:^1.1.5":
+"is-buffer@npm:^1.1.5, is-buffer@npm:~1.1.6":
   version: 1.1.6
   resolution: "is-buffer@npm:1.1.6"
   checksum: 336ec78f00e88efe6ff6f1aa08d06aadb942a6cd320e5f538ac00648378fb964743b3737c88ce7ce8741c067e4a3b78f596b83ee1a3c72dc2885ea0b03dc84f2
@@ -7131,6 +7214,13 @@ fsevents@~2.1.2:
   dependencies:
     is-extglob: ^2.1.1
   checksum: 98cd4f715f0fb81da34aa6c8be4a5ef02d8cfac3ebc885153012abc2a0410df5a572f9d0393134fcba9192c7a845da96142c5f74a3c02787efe178ed798615e6
+  languageName: node
+  linkType: hard
+
+"is-https@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "is-https@npm:1.0.0"
+  checksum: 9015bd5940b3143d4d61d0d8f3cacccbac6980a91d7f5397fec1982f6c3115dd99033f46d261ffbc872cc109004841dcb861f81f5978ecbe07f2c7b0c7eb91d2
   languageName: node
   linkType: hard
 
@@ -7344,6 +7434,13 @@ fsevents@~2.1.2:
   version: 0.1.11
   resolution: "jiti@npm:0.1.11"
   checksum: 5f78abe4b3985d78f8cee3816a8efeb6f9511974f276513e7326a3e80b5caa9d333485c80ccdd2d36242cc0314a89fe603a412800f119f7c5c4324c62e1b28b6
+  languageName: node
+  linkType: hard
+
+"js-cookie@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "js-cookie@npm:2.2.1"
+  checksum: c110f78427cb7715f67c69df0b3430f7cf9dafb5ddb13014df171d4fb61ccda0b1caf9767412cde63cab4bad697a5d4ce83b0c2e7ec650ec9929ed70750d20ae
   languageName: node
   linkType: hard
 
@@ -7869,6 +7966,17 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"md5@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "md5@npm:2.3.0"
+  dependencies:
+    charenc: 0.0.2
+    crypt: 0.0.2
+    is-buffer: ~1.1.6
+  checksum: ba00eaf2b7ca49bb7ba67b8ded5db45ecfba4e85694f30cb0b720051936af5337bbd350865357b91580ecb0f7053df658381d50cb689f22135dfa345c52d61cc
+  languageName: node
+  linkType: hard
+
 "mdn-data@npm:2.0.4":
   version: 2.0.4
   resolution: "mdn-data@npm:2.0.4"
@@ -8287,6 +8395,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"nanoid@npm:^2.1.11":
+  version: 2.1.11
+  resolution: "nanoid@npm:2.1.11"
+  checksum: 41453e344e3abb189cd3baa3ab52685601d7220f86ce73f6a1d9594ebae286c2acf47a20b5aa9cf11933b587b69c6007e88f190ca266450c2fbe20be6db43a29
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.1.10":
   version: 3.1.12
   resolution: "nanoid@npm:3.1.12"
@@ -8426,6 +8541,13 @@ fsevents@~2.1.2:
   version: 1.4.2
   resolution: "node-object-hash@npm:1.4.2"
   checksum: e6b36e82469501cfd50e55491a1f578a07991c586f086798fc4e6502eb4e10733690ef7b0575fc0191e81e8f3881d949625879a58543aa4b552ca2503f02c8af
+  languageName: node
+  linkType: hard
+
+"node-persist@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "node-persist@npm:3.1.0"
+  checksum: c0cb2ec59d56d7760b6efdbb553511009cd40ce4709c27e7f29b7eee1318572a346031879f732c932b496d47fa406d657a4b7717e4411f9ab031a70fb62e9443
   languageName: node
   linkType: hard
 

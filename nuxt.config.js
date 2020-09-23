@@ -1,6 +1,11 @@
 import packageMeta from './package.json'
 
 export default {
+
+  target: 'server',
+
+  modern: true,
+
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     title: process.env.title,
@@ -32,6 +37,10 @@ export default {
     // TODO: Baidu AIP config
   },
 
+  serverMiddleware: [
+    '~/lib/server/index.js'
+  ],
+
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,
 
@@ -46,11 +55,33 @@ export default {
     // https://go.nuxtjs.dev/bootstrap
     'bootstrap-vue/nuxt',
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    // https://auth.nuxtjs.org/
+    '@nuxtjs/auth'
   ],
 
+  router: {
+    middleware: [
+      'auth'
+    ]
+  },
+
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    retry: { retries: 3 }
+  },
+
+  // Auth module configuration (https://auth.nuxtjs.org/api/options.html)
+  auth: {
+    strategies: {
+      github: {
+        client_id: process.env.GITHUB_ID,
+        client_secret: process.env.GITHUB_SECRET,
+        userinfo_endpoint: false,
+        scope: ['read:user', 'user:email']
+      }
+    }
+  },
 
   // BootstrapVue module configuration (https://bootstrap-vue.org/docs#nuxtjs-module)
   bootstrapVue: {
