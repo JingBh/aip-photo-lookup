@@ -8,12 +8,7 @@
 </template>
 
 <script>
-import { BIconExclamationTriangle } from 'bootstrap-vue'
-
 export default {
-  auth: false,
-  components: {
-    BIconExclamationTriangle
-  }
+  auth: false
 }
 </script>

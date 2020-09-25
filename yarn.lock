@@ -2675,6 +2675,7 @@ __metadata:
     sass-loader: ^10.0.2
     vue-class-component: ^7.2.6
     vue-property-decorator: ^9.0.0
+    webrtc-adapter: ^7.7.0
   languageName: unknown
   linkType: soft
 
@@ -10796,6 +10797,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"rtcpeerconnection-shim@npm:^1.2.15":
+  version: 1.2.15
+  resolution: "rtcpeerconnection-shim@npm:1.2.15"
+  dependencies:
+    sdp: ^2.6.0
+  checksum: 45eeb1b3d5e4aff0309ec6e3c32fc3c83d4d5e511713cbd1bb317de022a27c73e0597fe893c31f8f10f092d90c64d52cf575f1a869850a859bbef155998f5552
+  languageName: node
+  linkType: hard
+
 "run-async@npm:^2.4.0":
   version: 2.4.1
   resolution: "run-async@npm:2.4.1"
@@ -10940,6 +10950,13 @@ fsevents@~2.1.2:
     ajv: ^6.12.4
     ajv-keywords: ^3.5.2
   checksum: 3851bcc7e44a3f35d3ca96e460c598aa24cec9fe395b196395316a043dc111d25735a9a49b1a115e4b52d5ed0d8bbcfb9fe1bfd077610f192b613e020d3f3ef2
+  languageName: node
+  linkType: hard
+
+"sdp@npm:^2.12.0, sdp@npm:^2.6.0":
+  version: 2.12.0
+  resolution: "sdp@npm:2.12.0"
+  checksum: 674e4342b211edb9f98cd17dcaa2aa2a71e7c1f9854b801499dabe3bf849194d10d242a8abe28a2291a6516a68973d46199105ef703372c5cd9844995626517f
   languageName: node
   linkType: hard
 
@@ -12807,6 +12824,16 @@ typescript@~4.0:
   peerDependencies:
     webpack: ^3.0.0 || ^4.0.0
   checksum: 2a5944c7a1e48d5d0fc5d9c555ef5c3c2e5349193e4bc4d607a178cb8d9dab3826bf87be165228f871e929af6798cb88e44c378645703567c0742c0e9f7b5b27
+  languageName: node
+  linkType: hard
+
+"webrtc-adapter@npm:^7.7.0":
+  version: 7.7.0
+  resolution: "webrtc-adapter@npm:7.7.0"
+  dependencies:
+    rtcpeerconnection-shim: ^1.2.15
+    sdp: ^2.12.0
+  checksum: f769455877d5c24e8d2d90263161c3c85363fb7e40a10ecf6a29c2d99d892df9e727138de9cac1f8bcf3e66174decf2feee26b411c1bb48f65eb3c8dfcd92ba1
   languageName: node
   linkType: hard
 

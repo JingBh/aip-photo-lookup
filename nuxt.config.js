@@ -94,8 +94,11 @@ export default {
       'ButtonPlugin',
       'FormFilePlugin',
       'FormGroupPlugin',
+      'IconsPlugin',
       'ImagePlugin',
-      'LayoutPlugin'
+      'LayoutPlugin',
+      'OverlayPlugin',
+      'SpinnerPlugin'
     ]
   },
 
