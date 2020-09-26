@@ -21,6 +21,7 @@ export default {
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
+    'tippy.js/dist/tippy.css',
     '~/assets/scss/app.scss'
   ],
 
@@ -33,12 +34,8 @@ export default {
     title: process.env.PAGE_TITLE || packageMeta.name
   },
 
-  privateRuntimeConfig: {
-    // TODO: Baidu AIP config
-  },
-
   serverMiddleware: [
-    '~/lib/server/index.js'
+    '~/lib/server'
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
@@ -92,11 +89,13 @@ export default {
     componentPlugins: [
       'AspectPlugin',
       'ButtonPlugin',
+      'CardPlugin',
       'FormFilePlugin',
       'FormGroupPlugin',
       'IconsPlugin',
       'ImagePlugin',
       'LayoutPlugin',
+      'LinkPlugin',
       'OverlayPlugin',
       'SpinnerPlugin'
     ]

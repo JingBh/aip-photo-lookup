@@ -12,6 +12,11 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
-    'space-before-function-paren': ['warn', 'never']
+    'space-before-function-paren': ['warn', {
+      anonymous: 'never',
+      named: 'never',
+      asyncArrow: 'always'
+    }],
+    'no-console': 'off'
   }
 }

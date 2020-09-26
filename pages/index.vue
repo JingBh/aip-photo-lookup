@@ -8,19 +8,27 @@
         <b-aspect id="image-container" aspect="16:9">
           <b-img
             v-show="imageUrl || !videoStream"
+            ref="image"
             :class="{ 'scanning': uploading }"
             :src="imageUrl"
             :blank="!imageUrl"
-            :fluid="!!imageUrl"
-            :fluid-grow="!imageUrl"
             blank-color="#aaa"
             thumbnail
           />
-          <flash-effect v-show="doFlash" />
-          <scan-effect v-show="uploading" />
+          <flash-effect v-if="doFlash" />
+          <scan-effect v-if="uploading" />
           <div v-show="!imageUrl && videoStream" id="video-container">
             <video ref="video" class="img-thumbnail" @loadedmetadata="videoEle.play()" />
           </div>
+          <face-mark
+            v-for="(face, i) in responseFaces"
+            :key="'face-' + i"
+            :offset-left="faceMarkOffsetLeft"
+            :offset-top="faceMarkOffsetTop"
+            :vector="imageVector"
+            :face="face"
+            :static="responseFaces.length == 1"
+          />
         </b-aspect>
       </b-col>
       <b-col md="6" lg="4" class="mb-3">
@@ -41,7 +49,7 @@
               </b-col>
             </b-form-row>
           </b-form-group>
-          <b-form-group v-if="!(imageUrl && !image)" label="选择图片" label-for="select-image">
+          <b-form-group v-show="!(imageUrl && !image)" key="select-image" label="选择图片" label-for="select-image">
             <b-form-file
               id="select-image"
               v-model="image"
@@ -76,7 +84,22 @@
                 <problem-component :problem="problem" />
               </li>
             </ul>
+            <b-card v-if="imageTooLarge" img-src="https://tinypng.com/images/panda-chewing-2x.png" img-left img-width="40%">
+              <b-card-text>
+                您可以尝试使用
+                <b-link href="https://tinypng.com/" target="_blank">
+                  TinyPNG
+                </b-link>
+                或
+                <b-link href="https://imagecompressor.com/zh/" target="_blank">
+                  Optimizilla
+                </b-link>
+                等工具压缩图片后再上传。
+              </b-card-text>
+            </b-card>
           </div>
+          <hr v-if="!uploadable && serverResponse">
+          <server-response v-if="serverResponse" class="my-4" :data="serverResponse" />
         </b-overlay>
       </b-col>
     </b-row>
@@ -88,41 +111,68 @@ import { Vue, Component, Ref } from 'vue-property-decorator'
 import 'webrtc-adapter'
 
 import Problem, { ProblemLevel } from '~/lib/classes/Problem'
+import { MultiSearchResponse, Face } from '~/lib/classes/AipTypes'
 import ProblemComponent from '~/components/Problem.vue'
+import FaceMark from '~/components/FaceMark.vue'
+import ServerResponse from '~/components/ServerResponse.vue'
 import FlashEffect from '~/components/FlashEffect.vue'
 import ScanEffect from '~/components/ScanEffect.vue'
 
 @Component({
   components: {
-    FlashEffect,
     ProblemComponent,
+    FaceMark,
+    ServerResponse,
+    FlashEffect,
     ScanEffect
   },
   middleware: 'check_access'
 })
 export default class IndexPage extends Vue {
-  image: File|null = null
+  readonly image: File | null = null
 
-  imageUrl: string|null = null
+  imageType: 'BASE64' | 'URL' | 'FACE_TOKEN' = 'BASE64'
+
+  imageUrl: string | null = null
+
+  @Ref('image') readonly imageEle!: HTMLImageElement
 
   doFlash: boolean = false
 
-  doFlashTimer: NodeJS.Timeout|null = null
+  doFlashTimer: NodeJS.Timeout | null = null
 
   @Ref('video') readonly videoEle!: HTMLVideoElement
 
-  videoStream: MediaStream|null = null
+  videoStream: MediaStream | null = null
 
   videoFacingUser: boolean = false
 
-  problems: Array<Problem> = []
-
-  serverInfos: Array<Problem> = []
+  problems: Problem[] = []
 
   uploading: boolean = false
 
-  get pageTitle(): string|undefined {
+  groups: string[] = []
+
+  groupsEnabled: string[] | boolean = true
+
+  serverResponse: MultiSearchResponse | null = null
+
+  faceMarkOffsetLeft: number = 0
+
+  faceMarkOffsetTop: number = 0
+
+  imageVector: number = 1
+
+  get pageTitle(): string | undefined {
     return this.$config.title
+  }
+
+  get imageTooLarge(): boolean {
+    if (this.imageUrl) {
+      return this.imageUrl.length > 2 * 1024 * 1024
+    } else {
+      return false
+    }
   }
 
   get uploadable(): boolean {
@@ -135,6 +185,14 @@ export default class IndexPage extends Vue {
       video: {
         facingMode: this.videoFacingUser ? 'user' : 'environment'
       }
+    }
+  }
+
+  get responseFaces(): Face[] {
+    if (this.serverResponse?.result) {
+      return this.serverResponse.result.face_list
+    } else {
+      return []
     }
   }
 
@@ -174,8 +232,9 @@ export default class IndexPage extends Vue {
       canvas.height = Number(videoInfo.height || 1080)
       const context = canvas.getContext('2d') as CanvasRenderingContext2D
       context.drawImage(this.videoEle, 0, 0, canvas.width, canvas.height)
-      this.imageUrl = canvas.toDataURL()
+      this.imageUrl = canvas.toDataURL('image/jpeg', 0.8)
       this.detectProblems()
+      this.updateFaceMarkOffsets()
     }
   }
 
@@ -185,36 +244,85 @@ export default class IndexPage extends Vue {
       reader.readAsDataURL(this.image)
       reader.onload = () => {
         this.imageUrl = (reader.result || '').toString()
+        this.detectProblems()
+        this.updateFaceMarkOffsets()
       }
     } else {
       this.imageUrl = null
+      this.detectProblems()
     }
-    this.detectProblems()
+    this.serverResponse = null
   }
 
   detectProblems() {
     const problems = []
     if (!this.imageUrl) {
       problems.push(new Problem(ProblemLevel.INFO, '请先选择或拍摄一张图片'))
-    } else if (this.imageUrl.length > 2 * 1024 * 1024) {
+    } else if (this.imageTooLarge) {
       // Must be smaller than 2MB
-      problems.push(new Problem(ProblemLevel.ERROR, '由于系统限制，图片大小必须小于 2MB'))
+      problems.push(new Problem(ProblemLevel.ERROR, '由于系统限制，图片大小必须小于 2MB。'))
     }
     this.problems = problems
-    this.serverInfos = []
   }
 
   uploadImage() {
     this.detectProblems()
     if (this.problems.length === 0) {
+      this.serverResponse = null
       this.uploading = true
-      // TODO: Upload the image
+      this.$axios.$post('/api/upload_image', {
+        image: this.imageUrl,
+        type: this.imageType,
+        groups: this.getGroupsEnabled()
+      }).then((response: MultiSearchResponse) => {
+        this.serverResponse = response
+        console.log(response)
+      }).finally(() => {
+        this.uploading = false
+        this.updateFaceMarkOffsets()
+      })
     }
   }
 
+  updateGroups() {
+    this.uploading = true
+    this.$axios.$get('/api/groups').then((result: string[]) => {
+      this.groups = result
+    }).finally(() => (this.uploading = false))
+  }
+
+  getGroupsEnabled() {
+    if (this.groupsEnabled === true) {
+      return this.groups
+    } else if (typeof this.groupsEnabled === 'object') {
+      return this.groupsEnabled
+    } else {
+      return []
+    }
+  }
+
+  updateFaceMarkOffsets() {
+    Vue.nextTick(() => {
+      this.faceMarkOffsetLeft = this.imageEle.offsetLeft + 5
+      this.faceMarkOffsetTop = this.imageEle.offsetTop + 5
+      this.imageVector = (this.imageEle.getBoundingClientRect().width - 10) / this.imageEle.naturalWidth
+    })
+  }
+
+  onResize() {
+    this.updateFaceMarkOffsets()
+  }
+
   mounted() {
+    window.addEventListener('resize', this.onResize)
     this.startVideoStream()
     this.detectProblems()
+    this.updateGroups()
+    this.updateFaceMarkOffsets()
+  }
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize)
   }
 }
 </script>

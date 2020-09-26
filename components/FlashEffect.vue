@@ -9,7 +9,7 @@
     background-color: white;
     user-select: none;
     pointer-events: none;
-    animation: flash 0.6s;
+    animation: flash 0.4s;
     opacity: 0;
     z-index: 1;
   }

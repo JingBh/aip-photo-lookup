@@ -14,7 +14,7 @@
     box-shadow: 0px 1px 5px 6px #72c0f0;
     user-select: none;
     pointer-events: none;
-    animation: scan 2s infinite;
+    animation: scan 3s infinite;
     z-index: 1;
   }
 
