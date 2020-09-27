@@ -1,109 +1,104 @@
 <template>
-  <b-container class="my-3">
-    <h1 class="display-4 text-center my-3 my-md-5">
-      {{ pageTitle }}
-    </h1>
-    <b-row>
-      <b-col md="6" lg="8" class="text-center mb-3">
-        <b-aspect id="image-container" aspect="16:9">
-          <b-img
-            v-show="imageUrl || !videoStream"
-            ref="image"
-            :class="{ 'scanning': uploading }"
-            :src="imageUrl"
-            :blank="!imageUrl"
-            blank-color="#aaa"
-            thumbnail
+  <b-row>
+    <b-col md="6" lg="8" class="text-center mb-3">
+      <b-aspect id="image-container" aspect="16:9">
+        <b-img
+          v-show="imageUrl || !videoStream"
+          ref="image"
+          :class="{ 'scanning': uploading }"
+          :src="imageUrl"
+          :blank="!imageUrl"
+          blank-color="#aaa"
+          thumbnail
+        />
+        <flash-effect v-if="doFlash" />
+        <scan-effect v-if="uploading" />
+        <div v-show="!imageUrl && videoStream" id="video-container">
+          <video ref="video" class="img-thumbnail" @loadedmetadata="videoEle.play()" />
+        </div>
+        <face-mark
+          v-for="(face, i) in responseFaces"
+          :key="'face-' + i"
+          :offset-left="faceMarkOffsetLeft"
+          :offset-top="faceMarkOffsetTop"
+          :vector="imageVector"
+          :face="face"
+          :static="responseFaces.length == 1"
+        />
+      </b-aspect>
+    </b-col>
+    <b-col md="6" lg="4" class="mb-3">
+      <b-overlay variant="white" spinner-variant="primary" :show="uploading || loading">
+        <b-form-group v-if="!imageUrl && videoStream" label="摄像头控制">
+          <b-form-row>
+            <b-col>
+              <b-button block size="sm" variant="primary" @click="takePhoto">
+                <b-icon-camera />
+                拍照
+              </b-button>
+            </b-col>
+            <b-col>
+              <b-button block size="sm" variant="success" @click="flipVideoFacingMode">
+                <b-icon-arrow-repeat />
+                翻转摄像头
+              </b-button>
+            </b-col>
+          </b-form-row>
+        </b-form-group>
+        <b-form-group v-show="!(imageUrl && !image)" key="select-image" label="选择图片" label-for="select-image">
+          <b-form-file
+            id="select-image"
+            v-model="image"
+            accept="image/*"
+            browse-text="浏览"
+            placeholder="请选择图片..."
+            drop-placeholder="拖动图片到这里..."
+            @input="onSelectImage"
           />
-          <flash-effect v-if="doFlash" />
-          <scan-effect v-if="uploading" />
-          <div v-show="!imageUrl && videoStream" id="video-container">
-            <video ref="video" class="img-thumbnail" @loadedmetadata="videoEle.play()" />
-          </div>
-          <face-mark
-            v-for="(face, i) in responseFaces"
-            :key="'face-' + i"
-            :offset-left="faceMarkOffsetLeft"
-            :offset-top="faceMarkOffsetTop"
-            :vector="imageVector"
-            :face="face"
-            :static="responseFaces.length == 1"
-          />
-        </b-aspect>
-      </b-col>
-      <b-col md="6" lg="4" class="mb-3">
-        <b-overlay variant="white" spinner-variant="primary" :show="uploading">
-          <b-form-group v-if="!imageUrl && videoStream" label="摄像头控制">
-            <b-form-row>
-              <b-col>
-                <b-button block size="sm" variant="primary" @click="takePhoto">
-                  <b-icon-camera />
-                  拍照
-                </b-button>
-              </b-col>
-              <b-col>
-                <b-button block size="sm" variant="success" @click="flipVideoFacingMode">
-                  <b-icon-arrow-repeat />
-                  翻转摄像头
-                </b-button>
-              </b-col>
-            </b-form-row>
-          </b-form-group>
-          <b-form-group v-show="!(imageUrl && !image)" key="select-image" label="选择图片" label-for="select-image">
-            <b-form-file
-              id="select-image"
-              v-model="image"
-              accept="image/*"
-              browse-text="浏览"
-              placeholder="请选择图片..."
-              drop-placeholder="拖动图片到这里..."
-              @input="onSelectImage"
-            />
-          </b-form-group>
-          <b-button v-if="imageUrl" block size="sm" variant="danger" @click="image = null; onSelectImage()">
-            <b-icon-x />
-            取消选择图片
-          </b-button>
-          <b-button
-            id="upload-button"
-            block
-            :size="(uploadable && !uploading) ? 'lg' : ''"
-            :variant="uploadable ? 'primary' : 'secondary'"
-            :disabled="uploading || !uploadable"
-            @click="uploadImage"
-          >
-            <span v-if="uploadable">
-              <b-icon-cloud-upload />
-              上传并分析图片
-            </span>
-            <span v-else>若要上传，请先解决下列问题</span>
-          </b-button>
-          <div v-if="!uploadable" class="my-3">
-            <ul class="list-unstyled">
-              <li v-for="(problem, i) in problems" :key="'problem-' + i">
-                <problem-component :problem="problem" />
-              </li>
-            </ul>
-            <b-card v-if="imageTooLarge" img-src="https://tinypng.com/images/panda-chewing-2x.png" img-left img-width="40%">
-              <b-card-text>
-                您可以尝试使用
-                <b-link href="https://tinypng.com/" target="_blank">
-                  TinyPNG
-                </b-link>
-                或
-                <b-link href="https://imagecompressor.com/zh/" target="_blank">
-                  Optimizilla
-                </b-link>
-                等工具压缩图片后再上传。
-              </b-card-text>
-            </b-card>
-          </div>
-          <hr v-if="!uploadable && serverResponse">
-          <server-response v-if="serverResponse" class="my-4" :data="serverResponse" />
-        </b-overlay>
-      </b-col>
-    </b-row>
-  </b-container>
+        </b-form-group>
+        <b-button v-if="imageUrl" block size="sm" variant="danger" @click="image = null; onSelectImage()">
+          <b-icon-x />
+          取消选择图片
+        </b-button>
+        <b-button
+          id="upload-button"
+          block
+          :size="(uploadable && !uploading) ? 'lg' : ''"
+          :variant="uploadable ? 'primary' : 'secondary'"
+          :disabled="uploading || !uploadable"
+          @click="uploadImage"
+        >
+          <span v-if="uploadable">
+            <b-icon-cloud-upload />
+            上传并分析图片
+          </span>
+          <span v-else>若要上传，请先解决下列问题</span>
+        </b-button>
+        <div v-if="!uploadable" class="my-3">
+          <ul class="list-unstyled">
+            <li v-for="(problem, i) in problems" :key="'problem-' + i">
+              <problem-component :problem="problem" />
+            </li>
+          </ul>
+          <b-card v-if="imageTooLarge" img-src="https://tinypng.com/images/panda-chewing-2x.png" img-left img-width="40%">
+            <b-card-text>
+              您可以尝试使用
+              <b-link href="https://tinypng.com/" target="_blank">
+                TinyPNG
+              </b-link>
+              或
+              <b-link href="https://imagecompressor.com/zh/" target="_blank">
+                Optimizilla
+              </b-link>
+              等工具压缩图片后再上传。
+            </b-card-text>
+          </b-card>
+        </div>
+        <hr v-if="!uploadable && serverResponse">
+        <server-response v-if="serverResponse" class="my-4" :data="serverResponse" />
+      </b-overlay>
+    </b-col>
+  </b-row>
 </template>
 
 <script lang="ts">
@@ -126,6 +121,7 @@ import ScanEffect from '~/components/ScanEffect.vue'
     FlashEffect,
     ScanEffect
   },
+  layout: 'main',
   middleware: 'check_access'
 })
 export default class IndexPage extends Vue {
@@ -151,6 +147,8 @@ export default class IndexPage extends Vue {
 
   uploading: boolean = false
 
+  loading: boolean = false
+
   groups: string[] = []
 
   groupsEnabled: string[] | boolean = true
@@ -162,10 +160,6 @@ export default class IndexPage extends Vue {
   faceMarkOffsetTop: number = 0
 
   imageVector: number = 1
-
-  get pageTitle(): string | undefined {
-    return this.$config.title
-  }
 
   get imageTooLarge(): boolean {
     if (this.imageUrl) {
@@ -285,10 +279,10 @@ export default class IndexPage extends Vue {
   }
 
   updateGroups() {
-    this.uploading = true
+    this.loading = true
     this.$axios.$get('/api/groups').then((result: string[]) => {
       this.groups = result
-    }).finally(() => (this.uploading = false))
+    }).finally(() => (this.loading = false))
   }
 
   getGroupsEnabled() {
