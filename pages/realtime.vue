@@ -176,13 +176,13 @@ export default class RealtimePage extends Vue {
     if (this.videoStream && groups.length > 0) {
       faceApi.detectSingleFace(this.videoEle, new faceApi.TinyFaceDetectorOptions({
         inputSize: 640,
-        scoreThreshold: 0.6
+        scoreThreshold: 0.5
       })).then((detection) => {
         if (detection) {
           this.takePhoto().then(() => (this.timer = setTimeout(this.doFaceDetection, 700)))
         } else {
           this.serverResponse = null
-          this.timer = setTimeout(this.doFaceDetection, 300)
+          this.timer = setTimeout(this.doFaceDetection, 50)
         }
         return detection
       })
