@@ -3,11 +3,13 @@
     <div class="d-none">
       <div v-if="user" ref="tooltip">
         <h5 class="mb-1">
-          {{ user.user_id }}
+          {{ userInfo ? userInfo.name : user.user_id }}
         </h5>
+        <p v-if="userInfo" class="mb-0">
+          ID：{{ user.user_id }}
+        </p>
         <p class="mb-0">
-          <strong>相似度：</strong>
-          {{ Math.round(user.score * 10) / 10 }}%
+          相似度：{{ Math.round(user.score * 10) / 10 }}%
         </p>
       </div>
       <div v-else ref="tooltip" class="text-danger">
@@ -19,9 +21,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Ref } from 'vue-property-decorator'
-import tippy, { Instance } from 'tippy.js'
+import tippy, { Instance, sticky } from 'tippy.js'
 
 import { Face, MatchUser } from '~/lib/classes/AipTypes'
+import { UserInfo } from '~/lib/classes/UserInfo'
 
 @Component
 export default class ServerResponse extends Vue {
@@ -78,18 +81,28 @@ export default class ServerResponse extends Vue {
     }
   }
 
+  get userInfo(): UserInfo | null {
+    // eslint-disable-next-line camelcase
+    if (this.user?.user_info) {
+      return JSON.parse(this.user.user_info) as UserInfo
+    } else {
+      return null
+    }
+  }
+
   initTooptip() {
     this.tooltipInstance = tippy(this.ele, {
       allowHTML: true,
       animation: 'scale',
       arrow: false,
       content: this.tooltipEle,
-      hideOnClick: !this.static,
-      placement: 'right-end'
+      hideOnClick: false,
+      moveTransition: 'transform 0.2s ease-out',
+      placement: 'right-end',
+      plugins: [sticky],
+      showOnCreate: this.static,
+      sticky: true
     })
-    if (this.static) {
-      this.tooltipInstance.show()
-    }
   }
 
   mounted() {
@@ -110,6 +123,8 @@ export default class ServerResponse extends Vue {
     margin: 0;
     border: solid 0.15rem var(--primary);
     transform-origin: top left;
+    transition: 0.2s ease-out;
+    transition-property: top, left, transform;
     border-radius: 5%;
     user-select: none;
     opacity: 0.7;

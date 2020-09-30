@@ -22,6 +22,7 @@ export default {
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
     'tippy.js/dist/tippy.css',
+    'tippy.js/animations/scale.css',
     '~/assets/scss/app.scss'
   ],
 

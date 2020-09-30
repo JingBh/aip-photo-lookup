@@ -5,7 +5,7 @@
         <video ref="video" class="img-thumbnail" @loadedmetadata="videoEle.play()" />
         <face-mark
           v-for="(face, i) in responseFaces"
-          :key="'face-' + i"
+          :key="'face-' + (face.user_list[0] ? face.user_list[0].user_id : i)"
           :offset-left="faceMarkOffsetLeft"
           :offset-top="faceMarkOffsetTop"
           :vector="imageVector"
