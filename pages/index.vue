@@ -192,7 +192,7 @@ export default class IndexPage extends Vue {
 
   flipVideoFacingMode() {
     this.videoFacingUser = !this.videoFacingUser
-    // this.startVideoStream()
+    this.startVideoStream()
   }
 
   startVideoStream() {

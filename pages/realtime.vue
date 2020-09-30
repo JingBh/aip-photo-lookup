@@ -91,7 +91,7 @@ export default class RealtimePage extends Vue {
 
   flipVideoFacingMode() {
     this.videoFacingUser = !this.videoFacingUser
-    // this.startVideoStream()
+    this.startVideoStream()
   }
 
   startVideoStream() {
