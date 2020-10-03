@@ -1,7 +1,7 @@
 <template>
   <b-row @drop.prevent="onDropFile" @dragover.prevent>
     <b-col md="6" lg="8" class="text-center mb-3">
-      <b-aspect id="image-container" aspect="16:9">
+      <b-aspect id="image-container" :aspect="aspect">
         <b-img
           v-show="imageUrl || !videoStream"
           ref="image"
@@ -181,6 +181,8 @@ export default class IndexPage extends Vue {
 
   imageVector: number = 1
 
+  aspect: number = 16 / 9
+
   get imageTooLarge(): boolean {
     if (this.imageUrl) {
       return this.imageUrl.length > 2 * 1024 * 1024
@@ -221,6 +223,8 @@ export default class IndexPage extends Vue {
       .then((stream: MediaStream) => {
         this.videoStream = stream
         this.videoEle.srcObject = stream
+        const videoInfo = this.videoStream.getVideoTracks()[0].getSettings()
+        this.aspect = Number(videoInfo.width || 1920) / Number(videoInfo.height || 1080)
       })
   }
 
