@@ -99,11 +99,11 @@
               <problem-component class="my-3" :problem="problem" />
             </li>
           </ul>
-          <b-card v-if="imageTooLarge" img-src="https://tinypng.com/images/panda-chewing-2x.png" img-left img-width="40%">
+          <b-card v-if="imageTooLarge" img-src="https://tinify.cn/images/panda-chewing-2x.png" img-left img-width="40%">
             <b-card-text>
               您可以尝试使用
-              <b-link href="https://tinypng.com/" target="_blank">
-                TinyPNG
+              <b-link href="https://tinify.cn/" target="_blank">
+                TiniPNG
               </b-link>
               或
               <b-link href="https://imagecompressor.com/zh/" target="_blank">
