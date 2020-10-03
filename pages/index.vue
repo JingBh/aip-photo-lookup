@@ -1,5 +1,5 @@
 <template>
-  <b-row>
+  <b-row @drop.prevent="onDropFile" @dragover.prevent>
     <b-col md="6" lg="8" class="text-center mb-3">
       <b-aspect id="image-container" aspect="16:9">
         <b-img
@@ -8,6 +8,7 @@
           :class="{ 'scanning': uploading }"
           :src="imageUrl"
           :blank="!imageUrl"
+          :fluid-grow="!imageUrl"
           blank-color="#aaa"
           thumbnail
         />
@@ -45,20 +46,37 @@
             </b-col>
           </b-form-row>
         </b-form-group>
-        <b-form-group v-show="!(imageUrl && !image)" key="select-image" label="选择图片" label-for="select-image">
+        <b-form-group
+          v-if="(imageType === 'BASE64' || !imageUrl) && !(imageUrl && !image)"
+          key="select-image"
+          label="选择图片"
+          label-for="select-image"
+        >
           <b-form-file
             id="select-image"
             v-model="image"
-            accept="image/*"
+            accept="image/jpeg, image/png"
             browse-text="浏览"
             placeholder="请选择图片..."
-            drop-placeholder="拖动图片到这里..."
+            drop-placeholder="拖动文件到这里..."
             @input="onSelectImage"
           />
         </b-form-group>
+        <b-form-group
+          v-if="imageType === 'URL' || !imageUrl"
+          key="input-image-url"
+          label="或输入图片 URL"
+          label-for="input-image-url"
+        >
+          <b-form-input
+            v-model="imageUrl"
+            placeholder="请输入图片 URL"
+            @input="onInputImageUrl"
+          />
+        </b-form-group>
         <b-button v-if="imageUrl" block size="sm" variant="danger" @click="image = null; onSelectImage()">
-          <b-icon-x />
-          取消选择图片
+          <b-icon-trash />
+          清空图片
         </b-button>
         <b-button
           id="upload-button"
@@ -69,6 +87,7 @@
           @click="uploadImage"
         >
           <span v-if="uploadable">
+            <!-- TODO: Scan only specified group. -->
             <b-icon-cloud-upload />
             上传并分析图片
           </span>
@@ -77,7 +96,7 @@
         <div v-if="!uploadable" class="my-3">
           <ul class="list-unstyled">
             <li v-for="(problem, i) in problems" :key="'problem-' + i">
-              <problem-component :problem="problem" />
+              <problem-component class="my-3" :problem="problem" />
             </li>
           </ul>
           <b-card v-if="imageTooLarge" img-src="https://tinypng.com/images/panda-chewing-2x.png" img-left img-width="40%">
@@ -92,6 +111,7 @@
               </b-link>
               等工具压缩图片后再上传。
             </b-card-text>
+            <!-- TODO: Automatically compress image below 5MB with TinyPNG API. -->
           </b-card>
         </div>
         <hr v-if="!uploadable && serverResponse">
@@ -125,7 +145,7 @@ import ScanEffect from '~/components/ScanEffect.vue'
   middleware: 'check_access'
 })
 export default class IndexPage extends Vue {
-  readonly image: File | null = null
+  image: File | null = null
 
   imageType: 'BASE64' | 'URL' | 'FACE_TOKEN' = 'BASE64'
 
@@ -246,15 +266,52 @@ export default class IndexPage extends Vue {
       this.detectProblems()
     }
     this.serverResponse = null
+    this.imageType = 'BASE64'
+  }
+
+  onInputImageUrl() {
+    this.image = null
+    this.serverResponse = null
+    this.imageType = 'URL'
+    this.detectProblems()
+  }
+
+  onDropFile(event: DragEvent) {
+    if (event.dataTransfer?.items) {
+      for (let i = 0; i < event.dataTransfer.items.length; i++) {
+        const item: DataTransferItem = event.dataTransfer.items[i]
+        switch (item.kind) {
+          case 'file':
+            this.image = item.getAsFile()
+            this.onSelectImage()
+            return
+          case 'string':
+            if (item.type === 'text/uri-list') {
+              item.getAsString((url) => {
+                this.imageUrl = url
+                this.imageType = 'URL'
+                this.onInputImageUrl()
+              })
+              return
+            }
+            break
+        }
+      }
+    }
   }
 
   detectProblems() {
     const problems = []
     if (!this.imageUrl) {
       problems.push(new Problem(ProblemLevel.INFO, '请先选择或拍摄一张图片'))
-    } else if (this.imageTooLarge) {
-      // Must be smaller than 2MB
-      problems.push(new Problem(ProblemLevel.ERROR, '由于系统限制，图片大小必须小于 2MB。'))
+    } else {
+      if (this.imageTooLarge) {
+        // Must be smaller than 2MB
+        problems.push(new Problem(ProblemLevel.ERROR, '由于系统限制，图片大小必须小于 2MB。'))
+      }
+      if (this.imageEle.complete !== true) {
+        problems.push(new Problem(ProblemLevel.WARN, '图片未完成加载。'))
+      }
     }
     this.problems = problems
   }
@@ -264,6 +321,16 @@ export default class IndexPage extends Vue {
     if (this.problems.length === 0) {
       this.serverResponse = null
       this.uploading = true
+      /* if (this.imageType === 'URL') {
+        const canvas = document.createElement('canvas')
+        canvas.width = Number(this.imageEle.naturalWidth || 1920)
+        canvas.height = Number(this.imageEle.naturalHeight || 1080)
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D
+        this.imageEle.crossOrigin = 'Anonymous'
+        context.drawImage(this.imageEle, 0, 0, canvas.width, canvas.height)
+        this.imageUrl = canvas.toDataURL('image/jpeg', 0.8)
+        this.imageType = 'BASE64'
+      } */
       this.$axios.$post('/api/upload_image', {
         image: this.imageUrl,
         type: this.imageType,

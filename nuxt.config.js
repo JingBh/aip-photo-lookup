@@ -93,6 +93,7 @@ export default {
       'CardPlugin',
       'FormFilePlugin',
       'FormGroupPlugin',
+      'FormInputPlugin',
       'IconsPlugin',
       'ImagePlugin',
       'LayoutPlugin',
