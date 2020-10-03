@@ -124,7 +124,8 @@ export default class RealtimePage extends Vue {
     return this.$axios.$post('/api/upload_image', {
       image,
       type: 'BASE64',
-      groups: this.getGroupsEnabled()
+      groups: this.getGroupsEnabled(),
+      realtime: 'true'
     }, {
       progress: false
     }).then((response: MultiSearchResponse) => {
