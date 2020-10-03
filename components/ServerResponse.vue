@@ -5,7 +5,7 @@
     </h4>
     <p class="lead">
       共检测到 {{ data.result.face_num }} 个人脸。<br>
-      <span v-if="data.result.face_num > 1">鼠标悬浮或点击人脸框来查看详情。</span>
+      鼠标悬浮或点击人脸框来查看详情。
     </p>
     <p v-if="data.result.face_num == 10" class="text-warning small">
       由于系统限制，只能识别最多 10 个人脸。若图片中有多于 10 个人，则无法正确识别。

@@ -10,7 +10,7 @@
           :offset-top="faceMarkOffsetTop"
           :vector="imageVector"
           :face="face"
-          :static="responseFaces.length == 1"
+          static
         />
       </b-aspect>
     </b-col>

@@ -1,12 +1,20 @@
 <template>
   <div ref="ele" class="face-mark" :style="styles">
+    <span v-if="user" class="face-name">
+      {{ userInfo ? userInfo.name : user.user_id }}
+    </span>
     <div class="d-none">
       <div v-if="user" ref="tooltip">
         <h5 class="mb-1">
           {{ userInfo ? userInfo.name : user.user_id }}
+          <span v-if="userInfo.gender === '男'" style="color: #39ccff" title="男">♂</span>
+          <span v-else-if="userInfo.gender === '女'" style="color: #ff79fc" title="女">♀</span>
         </h5>
         <p v-if="userInfo" class="mb-0">
           ID：{{ user.user_id }}
+        </p>
+        <p v-if="userInfo.classid" class="mb-0">
+          班级：{{ userInfo.classid }}
         </p>
         <p class="mb-0">
           相似度：{{ Math.round(user.score * 10) / 10 }}%
@@ -129,8 +137,25 @@ export default class ServerResponse extends Vue {
     user-select: none;
     opacity: 0.7;
 
+    .face-name {
+      position: absolute;
+      top: calc(100% + 0.25rem);
+      left: -0.15rem;
+      width: calc(100% + 0.3rem);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: black;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
     &:hover {
       border: solid 0.25rem var(--success);
+
+      .face-name {
+        top: calc(100% + 0.35rem);
+        left: -0.25rem;
+        width: calc(100% + 0.5rem);
+      }
     }
   }
 </style>

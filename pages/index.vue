@@ -24,7 +24,7 @@
           :offset-top="faceMarkOffsetTop"
           :vector="imageVector"
           :face="face"
-          :static="responseFaces.length == 1"
+          :static="face.user_list.length > 0 && i < 2"
         />
       </b-aspect>
     </b-col>
