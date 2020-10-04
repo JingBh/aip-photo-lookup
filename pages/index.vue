@@ -11,6 +11,8 @@
           :fluid-grow="!imageUrl"
           blank-color="#aaa"
           thumbnail
+          @load="onImageLoad"
+          @error="imageSize = [0, 0]"
         />
         <flash-effect v-if="doFlash" />
         <scan-effect v-if="uploading" />
@@ -74,29 +76,37 @@
             @input="onInputImageUrl"
           />
         </b-form-group>
-        <b-button v-if="imageUrl" block size="sm" variant="danger" @click="image = null; onSelectImage()">
-          <b-icon-trash />
-          清空图片
-        </b-button>
-        <b-button
-          id="upload-button"
-          block
-          :size="(uploadable && !uploading) ? 'lg' : ''"
-          :variant="uploadable ? 'primary' : 'secondary'"
-          :disabled="uploading || !uploadable"
-          @click="uploadImage"
-        >
-          <span v-if="uploadable">
-            <!-- TODO: Scan only specified group. -->
-            <b-icon-cloud-upload />
-            上传并分析图片
-          </span>
-          <span v-else>若要上传，请先解决下列问题</span>
-        </b-button>
+        <b-form-group v-if="imageUrl" key="image-control">
+          <b-button-group class="w-100 mb-2" size="sm">
+            <b-button variant="danger" @click="image = null; onSelectImage()">
+              <b-icon-trash />
+              清空图片
+            </b-button>
+            <b-button v-if="imageTooLarge && imageCompressable" variant="info" @click="compressImage">
+              <b-icon-arrows-angle-contract />
+              压缩图片
+            </b-button>
+          </b-button-group>
+          <b-button
+            id="upload-button"
+            block
+            :size="(uploadable && !uploading) ? 'lg' : ''"
+            :variant="uploadable ? 'primary' : 'secondary'"
+            :disabled="uploading || !uploadable"
+            @click="uploadImage"
+          >
+            <span v-if="uploadable">
+              <!-- TODO: Scan only specified group. -->
+              <b-icon-cloud-upload />
+              上传并分析图片
+            </span>
+            <span v-else>若要上传，请先解决下列问题</span>
+          </b-button>
+        </b-form-group>
         <div v-if="!uploadable" class="my-3">
           <ul class="list-unstyled">
-            <li v-for="(problem, i) in problems" :key="'problem-' + i">
-              <problem-component class="my-3" :problem="problem" />
+            <li v-for="(problem, i) in problems" :key="'problem-' + i" class="my-1">
+              <problem-component :problem="problem" />
             </li>
           </ul>
           <b-card v-if="imageTooLarge" img-src="https://tinify.cn/images/panda-chewing-2x.png" img-left img-width="40%">
@@ -111,7 +121,6 @@
               </b-link>
               等工具压缩图片后再上传。
             </b-card-text>
-            <!-- TODO: Automatically compress image below 5MB with TinyPNG API. -->
           </b-card>
         </div>
         <hr v-if="!uploadable && serverResponse">
@@ -153,6 +162,8 @@ export default class IndexPage extends Vue {
 
   @Ref('image') readonly imageEle!: HTMLImageElement
 
+  imageSize: [number, number] = [0, 0]
+
   doFlash: boolean = false
 
   doFlashTimer: NodeJS.Timeout | null = null
@@ -162,8 +173,6 @@ export default class IndexPage extends Vue {
   videoStream: MediaStream | null = null
 
   videoFacingUser: boolean = false
-
-  problems: Problem[] = []
 
   uploading: boolean = false
 
@@ -184,8 +193,25 @@ export default class IndexPage extends Vue {
   aspect: number = 16 / 9
 
   get imageTooLarge(): boolean {
-    if (this.imageUrl) {
-      return this.imageUrl.length > 2 * 1024 * 1024
+    if (this.imageSize[0] > 1920 || this.imageSize[1] > 1080) {
+      // 大于 1920 × 1080 无法上传百度
+      return true
+    } else if (this.imageUrl) {
+      // 大于 2MB 无法上传百度
+      const base64 = this.imageUrl.substring(this.imageUrl.indexOf(',') + 1)
+      const fileLength = base64.length / 4 * 3
+      return fileLength > 2 * 1024 * 1024
+    } else {
+      return false
+    }
+  }
+
+  get imageCompressable(): boolean {
+    // 小于 5MB 可压缩
+    if (this.imageUrl && this.imageType === 'BASE64' && this.imageTooLarge) {
+      const base64 = this.imageUrl.substring(this.imageUrl.indexOf(',') + 1)
+      const fileLength = base64.length / 4 * 3
+      return fileLength <= 5 * 1024 * 1024
     } else {
       return false
     }
@@ -210,6 +236,19 @@ export default class IndexPage extends Vue {
     } else {
       return []
     }
+  }
+
+  get problems(): Problem[] {
+    const problems = []
+    if (!this.imageUrl) {
+      problems.push(new Problem(ProblemLevel.WARN, '请先选择或拍摄一张图片'))
+    } else if (this.imageTooLarge) {
+      problems.push(new Problem(ProblemLevel.ERROR, '由于系统限制，图片大小必须小于 2MB，且小于 1920 × 1080 像素。'))
+      if (this.imageCompressable) {
+        problems.push(new Problem(ProblemLevel.INFO, '您可以尝试点击上面的“压缩图片”按钮进行自动压缩。'))
+      }
+    }
+    return problems
   }
 
   flipVideoFacingMode() {
@@ -251,8 +290,6 @@ export default class IndexPage extends Vue {
       const context = canvas.getContext('2d') as CanvasRenderingContext2D
       context.drawImage(this.videoEle, 0, 0, canvas.width, canvas.height)
       this.imageUrl = canvas.toDataURL('image/jpeg', 0.8)
-      this.detectProblems()
-      this.updateFaceMarkOffsets()
     }
   }
 
@@ -262,12 +299,9 @@ export default class IndexPage extends Vue {
       reader.readAsDataURL(this.image)
       reader.onload = () => {
         this.imageUrl = (reader.result || '').toString()
-        this.detectProblems()
-        this.updateFaceMarkOffsets()
       }
     } else {
       this.imageUrl = null
-      this.detectProblems()
     }
     this.serverResponse = null
     this.imageType = 'BASE64'
@@ -277,7 +311,6 @@ export default class IndexPage extends Vue {
     this.image = null
     this.serverResponse = null
     this.imageType = 'URL'
-    this.detectProblems()
   }
 
   onDropFile(event: DragEvent) {
@@ -293,8 +326,12 @@ export default class IndexPage extends Vue {
             if (item.type === 'text/uri-list') {
               item.getAsString((url) => {
                 this.imageUrl = url
-                this.imageType = 'URL'
-                this.onInputImageUrl()
+                if (url.substring(0, 5).toLowerCase() === 'data:') {
+                  this.imageType = 'BASE64'
+                } else {
+                  this.imageType = 'URL'
+                  this.onInputImageUrl()
+                }
               })
               return
             }
@@ -304,24 +341,24 @@ export default class IndexPage extends Vue {
     }
   }
 
-  detectProblems() {
-    const problems = []
-    if (!this.imageUrl) {
-      problems.push(new Problem(ProblemLevel.INFO, '请先选择或拍摄一张图片'))
-    } else {
-      if (this.imageTooLarge) {
-        // Must be smaller than 2MB
-        problems.push(new Problem(ProblemLevel.ERROR, '由于系统限制，图片大小必须小于 2MB。'))
-      }
-      if (this.imageEle.complete !== true) {
-        problems.push(new Problem(ProblemLevel.WARN, '图片未完成加载。'))
-      }
+  compressImage() {
+    if (this.imageCompressable) {
+      this.serverResponse = null
+      this.loading = true
+      this.$axios.$post('/api/compress_image', {
+        image: this.imageUrl
+      }).then((result: [boolean, string, string | null]) => {
+        if (result[0] === true && result[2]) {
+          this.image = null
+          this.imageUrl = result[2]
+        } else {
+          alert('压缩图片失败！' + (result[1] ? '\n' + result[1] : ''))
+        }
+      }).finally(() => (this.loading = false))
     }
-    this.problems = problems
   }
 
   uploadImage() {
-    this.detectProblems()
     if (this.problems.length === 0) {
       this.serverResponse = null
       this.uploading = true
@@ -374,6 +411,11 @@ export default class IndexPage extends Vue {
     })
   }
 
+  onImageLoad() {
+    this.updateFaceMarkOffsets()
+    this.imageSize = [this.imageEle.naturalWidth, this.imageEle.naturalHeight]
+  }
+
   onResize() {
     this.updateFaceMarkOffsets()
   }
@@ -381,7 +423,6 @@ export default class IndexPage extends Vue {
   mounted() {
     window.addEventListener('resize', this.onResize)
     this.startVideoStream()
-    this.detectProblems()
     this.updateGroups()
     this.updateFaceMarkOffsets()
   }

@@ -2724,6 +2724,7 @@ __metadata:
     nuxt: ^2.14.5
     sass: ^1.26.11
     sass-loader: ^10.0.2
+    tinify: ^1.6.0-beta.2
     tippy.js: ^6.2.6
     vue-class-component: ^7.2.6
     vue-property-decorator: ^9.0.0
@@ -10262,6 +10263,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"promise-nodeify@npm:>= 0.1":
+  version: 3.0.1
+  resolution: "promise-nodeify@npm:3.0.1"
+  checksum: ffcbc49423b68ef50428cc6bb007fc7f8af9b89d6c7236db2a9d4836396bf443233017c5c4f801f2347110d2303b72222440212cc7734b0df4434978c974b88a
+  languageName: node
+  linkType: hard
+
 "proper-lockfile@npm:^4.1.1":
   version: 4.1.1
   resolution: "proper-lockfile@npm:4.1.1"
@@ -10287,6 +10295,13 @@ fsevents@~2.1.2:
     forwarded: ~0.1.2
     ipaddr.js: 1.9.1
   checksum: a7dcfd70258cdc3b73c5dc4a35c73db9857f3bf4cf5e6404380e8ea558f8c5569147e721a01195d00b450e36b4dde727fc9d22fdea14310ba38faa595530cd58
+  languageName: node
+  linkType: hard
+
+"proxying-agent@npm:>= 2.1":
+  version: 2.4.0
+  resolution: "proxying-agent@npm:2.4.0"
+  checksum: 5fc36284d0a44561fe74e140942b669e4a799e0cb4a24c5b75d429595b83b17f707348825d7d960fa6f572a2676029d381c95fd035e43035e9cbc991d893ed80
   languageName: node
   linkType: hard
 
@@ -11995,6 +12010,16 @@ fsevents@~2.1.2:
   version: 0.3.0
   resolution: "timsort@npm:0.3.0"
   checksum: d8300c3ecf1a3751413de82b04ad283b461ab6fb1041820c825d13b4ae74526e2101ab5fb84c57a0c6e1f4d7f67173b5d8754ed8bb7447c6a9ce1db8562eb82c
+  languageName: node
+  linkType: hard
+
+"tinify@npm:^1.6.0-beta.2":
+  version: 1.6.0-beta.2
+  resolution: "tinify@npm:1.6.0-beta.2"
+  dependencies:
+    promise-nodeify: ">= 0.1"
+    proxying-agent: ">= 2.1"
+  checksum: 89f88706ecdcdb93e475fea5f0da2fb446c78d827bd5a0b73abf2ec4f0e1e8eb0a9b00bb02c63d0bc0c4d0e2450552e37bd4afd1176c1a786c8e600f14157f2c
   languageName: node
   linkType: hard
 

@@ -90,6 +90,7 @@ export default {
     componentPlugins: [
       'AspectPlugin',
       'ButtonPlugin',
+      'ButtonGroupPlugin',
       'CardPlugin',
       'FormFilePlugin',
       'FormGroupPlugin',
