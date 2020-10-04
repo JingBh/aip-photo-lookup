@@ -193,8 +193,8 @@ export default class IndexPage extends Vue {
   aspect: number = 16 / 9
 
   get imageTooLarge(): boolean {
-    if (this.imageSize[0] > 1920 || this.imageSize[1] > 1080) {
-      // 大于 1920 × 1080 无法上传百度
+    // if (this.imageSize[0] > 1920 || this.imageSize[1] > 1080) {
+    if (this.imageSize[0] > 2000 && this.imageSize[1] > 2000) {
       return true
     } else if (this.imageUrl) {
       // 大于 2MB 无法上传百度
