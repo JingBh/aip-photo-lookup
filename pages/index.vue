@@ -103,7 +103,7 @@
             <b-card-text>
               您可以尝试使用
               <b-link href="https://tinify.cn/" target="_blank">
-                TiniPNG
+                TinyPNG
               </b-link>
               或
               <b-link href="https://imagecompressor.com/zh/" target="_blank">
