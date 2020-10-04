@@ -1,6 +1,6 @@
 <template>
   <div ref="ele" class="face-mark" :style="styles">
-    <span v-if="user" class="face-name">
+    <span v-if="user" class="face-name" :style="{ 'font-size': fontSize }">
       {{ userInfo ? userInfo.name : user.user_id }}
     </span>
     <div class="d-none">
@@ -81,6 +81,10 @@ export default class ServerResponse extends Vue {
     }
   }
 
+  get fontSize() {
+    return Math.min(this.face.location.width * this.vector * 0.2, 16) + 'px'
+  }
+
   get user(): MatchUser | null {
     if (this.face.user_list.length > 0) {
       return this.face.user_list[0]
@@ -141,11 +145,13 @@ export default class ServerResponse extends Vue {
       position: absolute;
       top: calc(100% + 0.25rem);
       left: -0.15rem;
-      width: calc(100% + 0.3rem);
-      font-size: 0.8rem;
+      min-width: calc(100% + 0.3rem);
+      white-space: nowrap;
+      text-align: center;
       font-weight: 500;
       color: black;
       background-color: rgba(255, 255, 255, 0.5);
+      font-size-adjust: none;
     }
 
     &:hover {
@@ -154,7 +160,7 @@ export default class ServerResponse extends Vue {
       .face-name {
         top: calc(100% + 0.35rem);
         left: -0.25rem;
-        width: calc(100% + 0.5rem);
+        min-width: calc(100% + 0.5rem);
       }
     }
   }
